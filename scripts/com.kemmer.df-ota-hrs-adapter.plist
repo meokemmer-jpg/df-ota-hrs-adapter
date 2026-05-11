@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DF-OTA-Hrs-Adapter macOS LaunchAgent [CRUX-MK]
+     Welle-37 Foundation-DF (16. Foundation-DF im Kemmer-System).
+     HeyLou-Mosaic-Layer fuer HRS OTA-Integration.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.kemmer.df-ota-hrs-adapter</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>/Users/make/Projects/dark-factories/df-ota-hrs-adapter/scripts/run-df-ota-hrs-adapter-mac.sh</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StartInterval</key>
+    <integer>7200</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/make/Projects/dark-factories/df-ota-hrs-adapter/runs/stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/make/Projects/dark-factories/df-ota-hrs-adapter/runs/stderr.log</string>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/make/Projects/dark-factories/df-ota-hrs-adapter</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>DF_OTA_HRS_REAL_ENABLED</key>
+        <string>false</string>
+        <key>DF_OTA_HRS_TENANT_ID</key>
+        <string>hildesheim</string>
+        <key>DF_OTA_HRS_TIMEOUT_S</key>
+        <string>30</string>
+    </dict>
+</dict>
+</plist>

@@ -1,0 +1,128 @@
+# DF-OTA-Hrs-Adapter Configuration [CRUX-MK]
+#
+# Welle-37 HeyLou-Mosaic-OTA-Layer: HRS (DACH-Geschaeftsreise-Spezialist, 13% Kommission).
+
+df_id: df-ota-hrs-adapter
+df_name: HeyLou-Mosaic-Adapter-Hrs
+version: 0.1.0-SKELETON
+domain: travel-hospitality
+welle_introduced: welle-37
+type: foundation-df
+crux-mk: true
+
+adapter_target: hrs-ota
+commission_pct: 0.13
+
+llm_providers: []
+
+# === K11-K16 ===
+k11_cascade_isolation: hard
+failure_blast_radius: 1
+dependency_dlq_strategy: per-operation-jsonl
+
+k12_distillation_resistance:
+  output_feeds_into_training: false
+  provenance_required_in_output: true
+  non_llm_validation_layer: true
+
+k13_pre_action_verification:
+  enabled: true
+  external_anchor_type: vendor_api
+  external_anchor_validation_frequency: daily
+  pre_action_domain_check: true
+  pre_action_backup_check: true
+  pre_action_blast_radius_check: true
+  k0_q0_filter_enabled: true
+
+k14_human_override:
+  override_complexity: single_command
+  martin_review_cadence: weekly
+  bus_factor_handover_drilled: false
+  hardened_promotion_requires_phronesis_ticket: true
+
+k15_entropy_budget:
+  entropy_added_loc_estimate: 700
+  entropy_added_concepts:
+    - HrsConnector
+    - HrsAuthManager
+    - HrsWebhookHandler
+    - CommissionTracker
+    - HrsAdapterOrchestrator
+  entropy_justified_by_rho: 40000
+  entropy_subtractive_potential: 0
+
+k16_concurrent_spawn_protection: both
+lock_dir: /tmp/df-ota-hrs-adapter.lock
+lock_stale_age_h: 6
+engine_pgrep_check: true
+lock_release_on: EXIT_INT_TERM
+
+# === LC1-LC5 ===
+lose_coupling:
+  LC1_graceful_degradation:
+    degradation_modes:
+      - full
+      - degraded_no_real_api
+      - standalone_mock
+    degradation_test_required: true
+  LC2_direct_mode:
+    direct_mode_available: true
+    direct_mode_capability: 0.5
+    direct_mode_trigger: "DF_OTA_HRS_REAL_ENABLED!=true OR hrs-api-unreachable"
+  LC3_circuit_breaker:
+    circuit_breaker_timeout_s: 30
+    circuit_breaker_open_threshold: 3
+    circuit_breaker_half_open_test_interval_s: 300
+  LC4_failure_isolation:
+    state_externalization: true
+    idempotent_operations: true
+    dependency_dlq_separate: true
+  LC5_health_check:
+    health_check_dependencies: []
+    health_check_degraded_score: 0.5
+    health_check_endpoint_or_file: branch-hub/state/df-ota-hrs-adapter-health.json
+
+audit_dir: audit/
+audit_logs:
+  - ota-operations.jsonl
+  - ota-auth.jsonl
+  - commission-records.jsonl
+loop_reports_dir: runs/loop-reports/
+
+env_vars:
+  DF_OTA_HRS_REAL_ENABLED: false
+  HRS_HOTELIER_ID: ""
+  HRS_API_KEY: ""
+  DF_OTA_HRS_PHRONESIS_TICKET: ""
+  DF_OTA_HRS_HMAC_SECRET: ""
+  DF_OTA_HRS_WEBHOOK_SECRET: ""
+  DF_OTA_HRS_TENANT_ID: hildesheim
+  DF_OTA_HRS_TIMEOUT_S: 30
+
+sandbox_hotels:
+  - hotel_id: hildesheim
+    name: HeyLou Hildesheim
+    hrs_property_id: hrs-mock-hildesheim-001
+  - hotel_id: cape-coral
+    name: HeyLou Cape Coral
+    hrs_property_id: hrs-mock-cape-coral-001
+  - hotel_id: munich
+    name: HeyLou Munich
+    hrs_property_id: hrs-mock-munich-001
+
+promotion_path:
+  current_tier: SKELETON
+  target_tier: PRE-PRODUCTION-CONDITIONAL
+  pflicht_aktionen_welle_38:
+    - Cross-LLM-Wargame mit Codex+Gemini+Copilot
+    - Failure-Injection-Test-Pack >=7 Tests
+    - Real-Hrs-Sandbox-API Pilot
+    - Multi-Tenant-Isolation-Tests
+    - Hildesheim-Pilot 30 Tage Real-Hrs-Operation
+
+cascade_invariants:
+  orthogonal: "Adapter operiert nur auf HRS-Connect-API + Tarif-Verhandlung (OTA-Scope)"
+  kanonisch: "frozen dataclass AdapterResponse mit source/provenance/hash"
+  monoton: "Operations: connect -> query -> push_rate -> pull_bookings"
+  persistent: "JSONL Audit-Log + LoopReport-JSON + Commission-Records"
+  bounded: "per-operation timeout 30s"

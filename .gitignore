@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+audit/*.jsonl
+runs/loop-reports/*.json
+runs/stdout.log
+runs/stderr.log
+.DS_Store
+STOP.flag
