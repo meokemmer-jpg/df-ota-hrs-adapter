@@ -46,6 +46,9 @@ class HrsAdapterOrchestrator:
         from src.hrs_adapter import HrsConnector
         from src.commission_tracker import CommissionTracker
         from src.audit_logger import AuditLogger
+        from src.canonical_pms_ota_contract import CanonicalPmsOtaContract, ContractEvent
+        self.contract = CanonicalPmsOtaContract()
+        self.ContractEvent = ContractEvent
         self.auth = HrsAuthManager(sandbox_mode=self.sandbox_mode)
         self.connector = HrsConnector(sandbox_mode=self.sandbox_mode)
         self.tracker = CommissionTracker(df_id=self.DF_ID)
@@ -53,6 +56,11 @@ class HrsAdapterOrchestrator:
 
     def _now_iso(self) -> str:
         return datetime.now(timezone.utc).isoformat()
+
+    def _record_contract_event(self, name: str, reservation_id: str, payload: dict) -> None:
+        event = self.ContractEvent(self.tenant_id, name, reservation_id, payload)
+        row = self.contract.apply(event)
+        self.audit.log("canonical_contract_event", row)
 
     def _persist_loop_report(self, report: LoopReport) -> Optional[Path]:
         try:
@@ -76,6 +84,10 @@ class HrsAdapterOrchestrator:
         hotel_id = hotel_id or self.tenant_id
 
         try:
+            self._record_contract_event("pms_quote_accepted", loop_id, {
+                "hotel_id": hotel_id, "sandbox": self.sandbox_mode, "dry_run": dry_run
+            })
+            report.phases_passed.append("contract_quote")
             # Phase 1: Auth
             creds = None
             try:
