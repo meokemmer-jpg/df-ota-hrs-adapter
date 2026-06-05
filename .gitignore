@@ -8,3 +8,12 @@ runs/stdout.log
 runs/stderr.log
 .DS_Store
 STOP.flag
+*.env
+.env
+*.db
+*.sqlite
+*.sqlite3
+*.key
+*.pem
+secrets.json
+credentials.json
