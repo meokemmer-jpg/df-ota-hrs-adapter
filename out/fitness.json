@@ -1,0 +1,8 @@
+{
+  "df": "df-ota-hrs-adapter",
+  "ts": "2026-06-05T15:48:53.702177+00:00",
+  "ok": true,
+  "bytes": 2577,
+  "model": "qwen2.5:14b-instruct",
+  "duration_s": 60.3
+}
